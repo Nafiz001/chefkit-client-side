@@ -1,0 +1,66 @@
+import Link from "next/link";
+import { ChefHat } from "lucide-react";
+
+export default function Footer() {
+  return (
+    <footer className="bg-base-200 text-base-content">
+      <div className="footer p-10 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <aside className="sm:col-span-2 lg:col-span-1">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="bg-linear-to-br from-orange-500 to-red-500 p-2 rounded-lg">
+              <ChefHat className="w-6 h-6 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold">
+              <span className="text-primary">Chef</span>
+              <span className="text-orange-600">Kit</span>
+            </h2>
+          </div>
+          <p className="max-w-xs mb-3">
+            Discover, cook, and enjoy exceptional meal kits.<br />
+            Your culinary journey starts here.
+          </p>
+          <p className="text-sm mt-2">© {new Date().getFullYear()} ChefKit. All rights reserved.</p>
+        </aside>
+        <nav className="flex flex-col">
+          <h6 className="footer-title">Services</h6>
+          <Link href="/meal-kits" className="link link-hover">Browse Meal Kits</Link>
+          <Link href="/add-meal-kit" className="link link-hover">Add Meal Kit</Link>
+          <Link href="/manage-meal-kits" className="link link-hover">Manage Meal Kits</Link>
+          <Link href="/#chefs" className="link link-hover">Our Chefs</Link>
+        </nav>
+        <nav className="flex flex-col">
+          <h6 className="footer-title">Company</h6>
+          <a className="link link-hover">About us</a>
+          <a className="link link-hover">Contact</a>
+          <a className="link link-hover">Chefs</a>
+          <a className="link link-hover">Press kit</a>
+        </nav>
+        <nav className="flex flex-col">
+          <h6 className="footer-title">Follow Us</h6>
+          <div className="grid grid-flow-col gap-4 mt-2">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="link link-hover hover:text-primary transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+              </svg>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="link link-hover hover:text-primary transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
+              </svg>
+            </a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="link link-hover hover:text-primary transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current">
+                <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path>
+              </svg>
+            </a>
+          </div>
+        </nav>
+      </div>
+      <div className="footer footer-center p-4 bg-base-300 text-base-content">
+        <aside>
+          <p>Made with ❤️ by chefs, for food lovers</p>
+        </aside>
+      </div>
+    </footer>
+  );
+}
