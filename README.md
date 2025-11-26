@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+#  ChefKit - Restaurant-Quality Meal Kits Delivered
 
-## Getting Started
+ChefKit is a modern Next.js web application that brings restaurant-quality meal kits to your doorstep.
 
-First, run the development server:
+##  Features
 
-```bash
+- Landing page with 7 sections (Navbar, Hero, How It Works, Chefs, Meal Kits, Testimonials, Footer)
+- Browse meal kits with search and filter
+- Detailed meal kit pages
+- Authentication with NextAuth.js (Google OAuth + Credentials)
+- Protected pages for adding and managing meal kits
+
+##  Technologies
+
+- Next.js 16 (App Router)
+- JavaScript (JSX)
+- Tailwind CSS 4
+- NextAuth.js
+- React Hook Form
+- React Hot Toast
+- Lucide React Icons
+
+##  Setup
+
+`ash
+# Install dependencies
+npm install
+
+# Create .env.local and add:
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key
+GOOGLE_CLIENT_ID=your-google-id
+GOOGLE_CLIENT_SECRET=your-google-secret
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+##  Routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Public
+- / - Landing page
+- /meal-kits - Browse meal kits
+- /meal-kits/[id] - Meal kit details
+- /login - Login page
+- /register - Register page
 
-## Learn More
+### Protected (Auth Required)
+- /add-meal-kit - Add new meal kit
+- /manage-meal-kits - Manage your meal kits
 
-To learn more about Next.js, take a look at the following resources:
+##  Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Deploy to Vercel:
+1. Push to GitHub
+2. Import to Vercel
+3. Add environment variables
+4. Deploy!
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with  for ChefKit
