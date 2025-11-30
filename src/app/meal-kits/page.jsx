@@ -6,9 +6,11 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getMealKits } from "@/lib/api";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 export default function MealKitsPage() {
+  const { addToCart } = useCart();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
@@ -34,6 +36,12 @@ export default function MealKitsPage() {
     };
     fetchMealKits();
   }, []);
+
+  const handleAddToCart = (e, mealKit) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(mealKit, 1);
+  };
 
   const toggleFavorite = (e, mealKitId) => {
     e.preventDefault();
@@ -257,6 +265,13 @@ export default function MealKitsPage() {
                         <p className="text-xs text-base-content/50 uppercase tracking-wide">{mealKit.cuisine}</p>
                         <p className="text-lg font-bold text-primary">${mealKit.price}</p>
                       </div>
+                      <button
+                        onClick={(e) => handleAddToCart(e, mealKit)}
+                        className="btn btn-primary btn-sm w-full mt-2 gap-2"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        Add to Cart
+                      </button>
                     </div>
                   </div>
                 </Link>

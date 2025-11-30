@@ -8,16 +8,19 @@ import { useSession } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getMealKitById, getReviews, createReview, deleteReview } from "@/lib/api";
-import { ArrowLeft, Clock, Users, TrendingUp, ChefHat, Calendar, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, Clock, Users, TrendingUp, ChefHat, Calendar, Star, Trash2, ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
+import { useCart } from "@/contexts/CartContext";
 
 export default function MealKitDetailsPage({ params }) {
+  const { addToCart } = useCart();
   const [mealKit, setMealKit] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -50,6 +53,10 @@ export default function MealKitDetailsPage({ params }) {
       console.error('Error fetching reviews:', error);
       setReviewsLoading(false);
     }
+  };
+
+  const handleAddToCart = () => {
+    addToCart(mealKit, quantity);
   };
 
   const handleSubmitReview = async (e) => {
@@ -259,13 +266,43 @@ export default function MealKitDetailsPage({ params }) {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="flex-1 bg-linear-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all font-semibold text-lg shadow-lg hover:shadow-xl">
-                  Add to Cart
-                </button>
-                <button className="flex-1 bg-white text-gray-800 px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors font-semibold text-lg border-2 border-gray-200">
-                  Save for Later
-                </button>
+              <div className="space-y-4">
+                {/* Quantity Selector */}
+                <div className="flex items-center gap-4">
+                  <label className="text-sm font-medium text-gray-700">Quantity:</label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="btn btn-circle btn-sm btn-outline"
+                    >
+                      -
+                    </button>
+                    <span className="font-bold text-xl w-12 text-center">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="btn btn-circle btn-sm btn-outline"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button 
+                    onClick={handleAddToCart}
+                    className="flex-1 bg-linear-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all font-semibold text-lg shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    Add to Cart
+                  </button>
+                  <Link 
+                    href="/cart"
+                    className="flex-1 bg-white text-gray-800 px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors font-semibold text-lg border-2 border-gray-200 text-center"
+                  >
+                    View Cart
+                  </Link>
+                </div>
               </div>
 
               {/* Additional Info */}

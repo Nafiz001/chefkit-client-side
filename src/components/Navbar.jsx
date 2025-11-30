@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { ChefHat } from "lucide-react";
+import { ChefHat, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 export default function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const { cart } = useCart();
+  
+  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/" });
@@ -97,7 +101,19 @@ export default function Navbar() {
       </div>
       
       <div className="navbar-end flex items-center space-x-2 sm:space-x-4">
-        {session ? (
+        {/* Cart Icon */}
+        <Link href="/cart" className="btn btn-ghost btn-circle relative">
+          <ShoppingCart className="w-6 h-6" />
+          {cartItemCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-primary text-primary-content text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {cartItemCount}
+            </span>
+          )}
+        </Link>
+        
+        {status === "loading" ? (
+          <div className="skeleton w-24 h-10 rounded-lg"></div>
+        ) : session ? (
           <div className="dropdown dropdown-end">
             <div 
               tabIndex={0} 
