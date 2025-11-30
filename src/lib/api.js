@@ -77,3 +77,27 @@ export const getMyMealKits = async (email) => {
   const response = await fetch(`${API_URL}/my-meal-kits/${email}`);
   return response.json();
 };
+
+// Reviews API
+export const getReviews = async (mealKitId) => {
+  const response = await fetch(`${API_URL}/reviews/${mealKitId}`);
+  return response.json();
+};
+
+export const createReview = async (reviewData) => {
+  const response = await fetch(`${API_URL}/reviews`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(reviewData),
+  });
+  return response.json();
+};
+
+export const deleteReview = async (id) => {
+  const response = await fetch(`${API_URL}/reviews/${id}`, {
+    method: 'DELETE',
+  });
+  return response.json();
+};

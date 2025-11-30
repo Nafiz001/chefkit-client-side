@@ -4,15 +4,22 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getMealKitById } from "@/lib/api";
-import { ArrowLeft, Clock, Users, TrendingUp, ChefHat, DollarSign, Calendar } from "lucide-react";
+import { getMealKitById, getReviews, createReview, deleteReview } from "@/lib/api";
+import { ArrowLeft, Clock, Users, TrendingUp, ChefHat, Calendar, Star, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function MealKitDetailsPage({ params }) {
   const [mealKit, setMealKit] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchMealKit = async () => {
@@ -23,6 +30,7 @@ export default function MealKitDetailsPage({ params }) {
           router.push('/meal-kits');
         } else {
           setMealKit(data);
+          fetchReviews(resolvedParams.id);
         }
         setLoading(false);
       } catch (error) {
@@ -32,6 +40,71 @@ export default function MealKitDetailsPage({ params }) {
     };
     fetchMealKit();
   }, [params, router]);
+
+  const fetchReviews = async (mealKitId) => {
+    try {
+      const data = await getReviews(mealKitId);
+      setReviews(data);
+      setReviewsLoading(false);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      setReviewsLoading(false);
+    }
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    
+    if (!session) {
+      toast.error("Please login to submit a review");
+      router.push("/login");
+      return;
+    }
+
+    if (!newReview.comment.trim()) {
+      toast.error("Please write a review comment");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const reviewData = {
+        mealKitId: mealKit.id,
+        rating: newReview.rating,
+        comment: newReview.comment,
+        userName: session.user.name,
+        userEmail: session.user.email,
+        userImage: session.user.image || "https://i.pravatar.cc/150?img=68",
+      };
+
+      await createReview(reviewData);
+      toast.success("Review submitted successfully!");
+      setNewReview({ rating: 5, comment: "" });
+      fetchReviews(mealKit.id);
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast.error("Failed to submit review");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+
+    try {
+      await deleteReview(reviewId);
+      toast.success("Review deleted successfully!");
+      fetchReviews(mealKit.id);
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      toast.error("Failed to delete review");
+    }
+  };
+
+  const averageRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : 0;
 
   if (loading) {
     return (
@@ -201,6 +274,143 @@ export default function MealKitDetailsPage({ params }) {
                   <strong className="text-orange-700">Free Shipping</strong> on orders over $50 •
                   Fresh ingredients sourced daily • Recipe card included
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Reviews Section */}
+          <div className="mt-16">
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Customer Reviews</h2>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                      <span className="text-2xl font-bold text-gray-900">{averageRating}</span>
+                    </div>
+                    <span className="text-gray-600">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Review Form */}
+              {session ? (
+                <form onSubmit={handleSubmitReview} className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Write a Review</h3>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setNewReview({ ...newReview, rating: star })}
+                          className="focus:outline-none transition-transform hover:scale-110"
+                        >
+                          <Star
+                            className={`w-8 h-8 ${
+                              star <= newReview.rating
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                    <textarea
+                      className="textarea textarea-bordered w-full h-24 resize-none"
+                      placeholder="Share your experience with this meal kit..."
+                      value={newReview.comment}
+                      onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="btn btn-primary px-6"
+                  >
+                    {submitting ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </form>
+              ) : (
+                <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                  <p className="text-gray-600 mb-4">Please login to write a review</p>
+                  <Link href="/login" className="btn btn-primary">Login</Link>
+                </div>
+              )}
+
+              {/* Reviews List */}
+              <div className="space-y-6">
+                {reviewsLoading ? (
+                  <div className="text-center py-8">
+                    <span className="loading loading-spinner loading-lg text-primary"></span>
+                  </div>
+                ) : reviews.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <Star className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg">No reviews yet. Be the first to review!</p>
+                  </div>
+                ) : (
+                  reviews.map((review) => (
+                    <div key={review.id} className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="avatar">
+                            <div className="w-12 rounded-full">
+                              <Image
+                                src={review.userImage}
+                                alt={review.userName}
+                                width={48}
+                                height={48}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">{review.userName}</p>
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${
+                                      i < review.rating
+                                        ? 'fill-yellow-400 text-yellow-400'
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm text-gray-500">
+                                {new Date(review.createdAt).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {session?.user?.email === review.userEmail && (
+                          <button
+                            onClick={() => handleDeleteReview(review.id)}
+                            className="btn btn-ghost btn-sm text-error"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
