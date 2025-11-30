@@ -6,12 +6,20 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getMealKits } from "@/lib/api";
+import { Heart } from "lucide-react";
 
 export default function MealKitsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("All");
+  const [sortBy, setSortBy] = useState("newest");
   const [mealKits, setMealKits] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('favorites') || '[]');
+    }
+    return [];
+  });
 
   useEffect(() => {
     const fetchMealKits = async () => {
@@ -27,6 +35,18 @@ export default function MealKitsPage() {
     fetchMealKits();
   }, []);
 
+  const toggleFavorite = (e, mealKitId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const newFavorites = favorites.includes(mealKitId)
+      ? favorites.filter(id => id !== mealKitId)
+      : [...favorites, mealKitId];
+    
+    setFavorites(newFavorites);
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+  };
+
   const cuisines = ["All", ...new Set(mealKits.map((kit) => kit.cuisine))];
 
   const filteredMealKits = mealKits.filter((kit) => {
@@ -37,6 +57,18 @@ export default function MealKitsPage() {
     const matchesCuisine = selectedCuisine === "All" || kit.cuisine === selectedCuisine;
 
     return matchesSearch && matchesCuisine;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'price-asc':
+        return a.price - b.price;
+      case 'price-desc':
+        return b.price - a.price;
+      case 'name':
+        return a.title.localeCompare(b.title);
+      case 'newest':
+      default:
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    }
   });
 
   const handleSearch = (e) => {
@@ -115,11 +147,30 @@ export default function MealKitsPage() {
               </div>
             </div>
 
+            {/* Sort Options */}
+            <div className="mt-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold text-base-content">Sort by</span>
+                </label>
+                <select
+                  className="select select-bordered w-full md:w-64"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="name">Name: A-Z</option>
+                </select>
+              </div>
+            </div>
+
             {/* Active Filters Display */}
             <div className="mt-4 flex flex-wrap gap-2">
               {searchTerm && (
                 <div className="badge badge-lg badge-primary gap-2">
-                  Search: "{searchTerm}"
+                  Search: &quot;{searchTerm}&quot;
                   <button
                     onClick={() => setSearchTerm("")}
                     className="btn btn-ghost btn-xs"
@@ -181,6 +232,21 @@ export default function MealKitsPage() {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      
+                      {/* Favorite Button */}
+                      <button
+                        onClick={(e) => toggleFavorite(e, mealKit.id)}
+                        className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors z-10"
+                        aria-label="Add to favorites"
+                      >
+                        <Heart
+                          className={`w-5 h-5 transition-colors ${
+                            favorites.includes(mealKit.id)
+                              ? 'fill-red-500 text-red-500'
+                              : 'text-gray-600'
+                          }`}
+                        />
+                      </button>
                     </div>
                     <div className="pt-4 space-y-2 p-4">
                       <h3 className="font-medium text-base-content group-hover:text-primary transition-colors">
