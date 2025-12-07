@@ -1,9 +1,25 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@theme {
+  --color-primary: #0d9488;
+  --color-primary-content: #ffffff;
+  --color-secondary: #f43f5e;
+  --color-secondary-content: #ffffff;
+  --color-accent: #8b5cf6;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1f2937;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #ffffff;
+  --color-base-200: #f8fafc;
+  --color-base-300: #e2e8f0;
+  --color-base-content: #1e293b;
+}
+
 body {
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
 }
 
 /* Custom scrollbar */
@@ -12,15 +28,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #e2e8f0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f97316;
+  background: linear-gradient(180deg, #0d9488 0%, #14b8a6 100%);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ea580c;
+  background: linear-gradient(180deg, #0f766e 0%, #0d9488 100%);
 }
 
