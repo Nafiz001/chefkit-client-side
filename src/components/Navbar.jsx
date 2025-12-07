@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { ChefHat, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { motion } from "framer-motion";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -62,12 +61,7 @@ export default function Navbar() {
   );
 
   return (
-    <motion.div 
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="navbar bg-base-100/80 backdrop-blur-md shadow-lg px-1 md:px-6 py-4 sticky top-0 z-50"
-    >
+    <div className="navbar bg-base-100 shadow-lg px-1 md:px-6 py-4">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -94,15 +88,11 @@ export default function Navbar() {
           </ul>
         </div>
         <Link href="/" className="text-lg sm:text-2xl font-bold tracking-wide ml-2 sm:ml-4 flex items-center gap-2">
-          <motion.div 
-            whileHover={{ rotate: 360, scale: 1.1 }}
-            transition={{ duration: 0.5 }}
-            className="bg-linear-to-br from-primary to-secondary p-2 rounded-lg shadow-md"
-          >
+          <div className="bg-linear-to-br from-orange-500 to-red-500 p-2 rounded-lg">
             <ChefHat className="w-5 h-5 text-white" />
-          </motion.div>
+          </div>
           <span className="text-primary">Chef</span>
-          <span className="text-secondary ml-1">Kit</span>
+          <span className="text-orange-600 ml-1">Kit</span>
         </Link>
       </div>
       
@@ -112,39 +102,25 @@ export default function Navbar() {
       
       <div className="navbar-end flex items-center space-x-2 sm:space-x-4">
         {/* Cart Icon */}
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Link href="/cart" className="btn btn-ghost btn-circle relative">
-            <ShoppingCart className="w-6 h-6" />
-            {cartItemCount > 0 && (
-              <motion.span 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 bg-secondary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
-              >
-                {cartItemCount}
-              </motion.span>
-            )}
-          </Link>
-        </motion.div>
+        <Link href="/cart" className="btn btn-ghost btn-circle relative">
+          <ShoppingCart className="w-6 h-6" />
+          {cartItemCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-primary text-primary-content text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {cartItemCount}
+            </span>
+          )}
+        </Link>
         
         {status === "loading" ? (
           <div className="skeleton w-24 h-10 rounded-lg"></div>
         ) : session ? (
-          <motion.div 
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="dropdown dropdown-end"
-          >
+          <div className="dropdown dropdown-end">
             <div 
               tabIndex={0} 
               role="button" 
               className="btn btn-ghost btn-circle avatar"
             >
-              <div className="w-10 rounded-full ring-2 ring-primary ring-offset-2 bg-linear-to-r from-primary to-secondary flex items-center justify-center text-white font-bold">
+              <div className="w-10 rounded-full ring-2 ring-primary ring-offset-2 bg-linear-to-r from-orange-500 to-red-500 flex items-center justify-center text-white font-bold">
                 {session.user?.name?.[0]?.toUpperCase() || "U"}
               </div>
             </div>
@@ -189,27 +165,18 @@ export default function Navbar() {
                 </button>
               </li>
             </ul>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div 
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex space-x-2"
-          >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/login" className="btn btn-primary btn-sm sm:btn-md px-3 sm:px-6 py-2">
-                Login
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/register" className="btn btn-outline btn-primary btn-sm sm:btn-md px-3 sm:px-6 py-2">
-                Register
-              </Link>
-            </motion.div>
-          </motion.div>
+          <div className="flex space-x-2">
+            <Link href="/login" className="btn btn-sm sm:btn-md px-3 sm:px-6 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 hover:from-orange-600 hover:to-red-600 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              Login
+            </Link>
+            <Link href="/register" className="btn btn-sm sm:btn-md px-3 sm:px-6 py-2 bg-white text-orange-600 border-2 border-orange-500 hover:bg-orange-50 hover:border-red-500 transition-all duration-300 hover:scale-105">
+              Register
+            </Link>
+          </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

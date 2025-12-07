@@ -19,19 +19,22 @@ export default function Home() {
       image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200&q=80",
       title: "Cook Like a Chef",
       subtitle: "Discover chef-crafted meal kits delivered to your door",
-      cta: "Shop Meal Kits"
+      cta: "Shop Meal Kits",
+      link: "/meal-kits"
     },
     {
       image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=1200&q=80", 
       title: "Fresh Ingredients",
       subtitle: "Premium quality ingredients, perfectly portioned",
-      cta: "Explore Options"
+      cta: "Explore Options",
+      link: "/meal-kits"
     },
     {
       image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80",
       title: "Easy Recipes",
       subtitle: "Restaurant-quality meals made simple at home",
-      cta: "View Recipes"
+      cta: "View Recipes",
+      link: "/meal-kits"
     },
   ];
 
@@ -60,59 +63,114 @@ export default function Home() {
     <div className="min-h-screen bg-base-100">
       <Navbar />
 
-      {/* Hero Slider Section */}
-      <div className="relative h-[70vh] lg:h-[80vh] overflow-hidden bg-linear-to-r from-base-300 to-base-200">
+      {/* Hero Slider Section - Completely Redesigned */}
+      <div className="relative h-[65vh] overflow-hidden">
         {slides.map((slide, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-              index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
+              index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
-            <div className="grid lg:grid-cols-2 h-full">
-              <div className="flex items-center justify-center p-8 lg:p-16 bg-linear-to-br from-primary/5 to-secondary/5">
-                <div className="max-w-xl text-center lg:text-left">
-                  <h1 className="text-4xl lg:text-6xl font-light mb-6 text-base-content leading-tight">
-                    {slide.title}
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0">
+              <Image
+                src={slide.image}
+                alt={slide.title}
+                fill
+                sizes="100vw"
+                className="object-cover"
+                priority={index === 0}
+              />
+              {/* Gradient Overlays */}
+              <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-transparent"></div>
+              <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent"></div>
+            </div>
+
+            {/* Content */}
+            <div className="relative h-full flex items-center z-10">
+              <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 w-full">
+                <div className="max-w-3xl">
+                  {/* Animated Badge */}
+                  <div className="inline-flex items-center gap-2 bg-linear-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-full mb-4 animate-pulse">
+                    <ChefHat className="w-4 h-4" />
+                    <span className="text-xs font-semibold tracking-wider uppercase">Premium Meal Kits</span>
+                  </div>
+                  
+                  {/* Main Title with Gradient */}
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                    <span className="bg-linear-to-r from-white via-orange-100 to-orange-200 bg-clip-text text-transparent">
+                      {slide.title}
+                    </span>
                   </h1>
-                  <p className="text-lg lg:text-xl text-base-content/70 mb-8 font-light leading-relaxed">
+                  
+                  {/* Subtitle */}
+                  <p className="text-lg sm:text-xl lg:text-2xl text-gray-200 mb-6 font-light leading-relaxed max-w-2xl">
                     {slide.subtitle}
                   </p>
-                  <br />
-                  <Link 
-                    href="/meal-kits" 
-                    className="btn btn-primary btn-lg px-8 py-3 rounded-none border-0 bg-neutral text-white hover:bg-neutral-focus transition-all duration-300 text-sm font-medium tracking-wider uppercase"
-                  >
-                    {slide.cta}
-                  </Link>
+                  
+                  {/* CTA Buttons */}
+                  <div className="flex flex-wrap gap-3 relative z-20">
+                    <Link 
+                      href={slide.link} 
+                      className="group relative overflow-hidden bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3 rounded-full font-semibold text-base transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/50 flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>{slide.cta}</span>
+                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </Link>
+                    
+                    <Link 
+                      href="/#how-it-works" 
+                      className="bg-white/10 backdrop-blur-sm text-white px-8 py-3 rounded-full font-semibold text-base border-2 border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>Learn More</span>
+                      <Clock className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
               </div>
-              
-              <div className="relative overflow-hidden hidden lg:block">
-                <Image
-                  src={slide.image}
-                  alt={slide.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-1000 hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-linear-to-l from-transparent to-primary/10"></div>
-              </div>
             </div>
+
+            {/* Decorative Elements */}
+            <div className="absolute top-10 right-10 w-64 h-64 bg-linear-to-br from-orange-500/20 to-red-500/20 rounded-full blur-3xl animate-pulse -z-10 pointer-events-none"></div>
+            <div className="absolute bottom-10 left-10 w-72 h-72 bg-linear-to-tr from-orange-500/10 to-red-500/10 rounded-full blur-3xl animate-pulse -z-10 pointer-events-none" style={{animationDelay: "1s"}}></div>
           </div>
         ))}
         
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3">
+        {/* Slide Indicators - Redesigned */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 bg-black/30 backdrop-blur-sm px-6 py-3 rounded-full z-30">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentSlide ? "bg-white scale-125" : "bg-white/50 hover:bg-white/75"
+              className={`transition-all duration-300 rounded-full ${
+                index === currentSlide 
+                  ? "w-12 h-3 bg-linear-to-r from-orange-500 to-red-500" 
+                  : "w-3 h-3 bg-white/40 hover:bg-white/60"
               }`}
             />
           ))}
         </div>
+        
+        {/* Navigation Arrows */}
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group z-30"
+        >
+          <svg className="w-6 h-6 text-white group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group z-30"
+        >
+          <svg className="w-6 h-6 text-white group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
       {/* Featured Meal Kits Section */}
@@ -379,7 +437,7 @@ export default function Home() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="input input-bordered flex-1 rounded-none bg-white text-neutral w-full sm:w-auto min-h-[48px]"
+              className="input input-bordered flex-1 rounded-none bg-white text-neutral w-full sm:w-auto min-h-12"
               suppressHydrationWarning
             />
             <button 

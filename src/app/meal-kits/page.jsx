@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
@@ -8,11 +8,6 @@ import Footer from "@/components/Footer";
 import { getMealKits } from "@/lib/api";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { motion } from "framer-motion";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function MealKitsPage() {
   const { addToCart } = useCart();
@@ -27,8 +22,6 @@ export default function MealKitsPage() {
     }
     return [];
   });
-  const cardsRef = useRef([]);
-  const filterSectionRef = useRef(null);
 
   useEffect(() => {
     const fetchMealKits = async () => {
@@ -86,54 +79,6 @@ export default function MealKitsPage() {
     }
   });
 
-  useEffect(() => {
-    if (!loading && filteredMealKits.length > 0) {
-      // GSAP scroll animations for cards
-      cardsRef.current.forEach((card, index) => {
-        if (card) {
-          gsap.fromTo(
-            card,
-            {
-              opacity: 0,
-              y: 50,
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              delay: index * 0.1,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 85%",
-                end: "top 20%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
-        }
-      });
-    }
-
-    // Filter section animation
-    if (filterSectionRef.current) {
-      gsap.fromTo(
-        filterSectionRef.current,
-        { opacity: 0, y: -30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: "power2.out",
-        }
-      );
-    }
-
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
-  }, [loading, filteredMealKits.length]);
-
   const handleSearch = (e) => {
     e.preventDefault();
   };
@@ -145,20 +90,15 @@ export default function MealKitsPage() {
       <div className="py-12 px-4">
         <div className="container mx-auto">
           {/* Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-5xl font-bold mb-4 text-primary">Explore Meal Kits</h1>
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-bold mb-4 text-base-content">Explore Meal Kits</h1>
             <p className="text-xl text-base-content/70">
               Discover chef-crafted meal kits from around the world
             </p>
-          </motion.div>
+          </div>
 
           {/* Search and Filter Section */}
-          <div ref={filterSectionRef} className="bg-base-200/50 backdrop-blur-sm p-6 rounded-lg shadow-lg mb-12 border border-primary/10">
+          <div className="bg-base-200 p-6 rounded-lg shadow-lg mb-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Search */}
               <form onSubmit={handleSearch} className="form-control">
@@ -288,18 +228,9 @@ export default function MealKitsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredMealKits.map((mealKit, index) => (
-                <Link 
-                  key={mealKit.id} 
-                  href={`/meal-kits/${mealKit.id}`} 
-                  className="group cursor-pointer"
-                  ref={(el) => (cardsRef.current[index] = el)}
-                >
-                  <motion.div 
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    transition={{ duration: 0.3 }}
-                    className="relative overflow-hidden bg-white rounded-lg shadow-md hover:shadow-2xl transition-all duration-500 border border-primary/10"
-                  >
+              {filteredMealKits.map((mealKit) => (
+                <Link key={mealKit.id} href={`/meal-kits/${mealKit.id}`} className="group cursor-pointer">
+                  <div className="relative overflow-hidden bg-white rounded-sm shadow-sm hover:shadow-xl transition-all duration-500">
                     <div className="relative h-64">
                       <Image
                         src={mealKit.image}
@@ -311,9 +242,7 @@ export default function MealKitsPage() {
                       <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       
                       {/* Favorite Button */}
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
+                      <button
                         onClick={(e) => toggleFavorite(e, mealKit.id)}
                         className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors z-10"
                         aria-label="Add to favorites"
@@ -321,11 +250,11 @@ export default function MealKitsPage() {
                         <Heart
                           className={`w-5 h-5 transition-colors ${
                             favorites.includes(mealKit.id)
-                              ? 'fill-secondary text-secondary'
+                              ? 'fill-red-500 text-red-500'
                               : 'text-gray-600'
                           }`}
                         />
-                      </motion.button>
+                      </button>
                     </div>
                     <div className="pt-4 space-y-2 p-4">
                       <h3 className="font-medium text-base-content group-hover:text-primary transition-colors">
@@ -336,17 +265,15 @@ export default function MealKitsPage() {
                         <p className="text-xs text-base-content/50 uppercase tracking-wide">{mealKit.cuisine}</p>
                         <p className="text-lg font-bold text-primary">${mealKit.price}</p>
                       </div>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                      <button
                         onClick={(e) => handleAddToCart(e, mealKit)}
                         className="btn btn-primary btn-sm w-full mt-2 gap-2"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         Add to Cart
-                      </motion.button>
+                      </button>
                     </div>
-                  </motion.div>
+                  </div>
                 </Link>
               ))}
             </div>

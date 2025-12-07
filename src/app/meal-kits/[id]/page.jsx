@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -11,11 +11,6 @@ import { getMealKitById, getReviews, createReview, deleteReview } from "@/lib/ap
 import { ArrowLeft, Clock, Users, TrendingUp, ChefHat, Calendar, Star, Trash2, ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCart } from "@/contexts/CartContext";
-import { motion } from "framer-motion";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function MealKitDetailsPage({ params }) {
   const { addToCart } = useCart();
@@ -28,8 +23,6 @@ export default function MealKitDetailsPage({ params }) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const { data: session } = useSession();
-  const detailsRef = useRef(null);
-  const reviewsRef = useRef(null);
 
   useEffect(() => {
     const fetchMealKit = async () => {
@@ -50,39 +43,6 @@ export default function MealKitDetailsPage({ params }) {
     };
     fetchMealKit();
   }, [params, router]);
-
-  useEffect(() => {
-    if (!loading && mealKit && detailsRef.current) {
-      gsap.fromTo(
-        detailsRef.current.children,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: "power2.out",
-        }
-      );
-    }
-
-    if (!reviewsLoading && reviewsRef.current) {
-      gsap.fromTo(
-        reviewsRef.current,
-        { opacity: 0, x: -30 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.6,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: reviewsRef.current,
-            start: "top 80%",
-          },
-        }
-      );
-    }
-  }, [loading, mealKit, reviewsLoading]);
 
   const fetchReviews = async (mealKitId) => {
     try {
@@ -199,11 +159,7 @@ export default function MealKitDetailsPage({ params }) {
 
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Image Section */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
+            <div>
               <div className="relative h-96 lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   src={mealKit.image}
@@ -234,10 +190,10 @@ export default function MealKitDetailsPage({ params }) {
                   </span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Details Section */}
-            <div ref={detailsRef} className="space-y-6">
+            <div className="space-y-6">
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
                   {mealKit.title}
@@ -333,15 +289,13 @@ export default function MealKitDetailsPage({ params }) {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <button 
                     onClick={handleAddToCart}
-                    className="flex-1 bg-linear-to-r from-primary to-secondary text-white px-8 py-4 rounded-lg hover:shadow-xl transition-all font-semibold text-lg shadow-lg flex items-center justify-center gap-2"
+                    className="flex-1 bg-linear-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all font-semibold text-lg shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
                     <ShoppingCart className="w-5 h-5" />
                     Add to Cart
-                  </motion.button>
+                  </button>
                   <Link 
                     href="/cart"
                     className="flex-1 bg-white text-gray-800 px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors font-semibold text-lg border-2 border-gray-200 text-center"
@@ -362,17 +316,17 @@ export default function MealKitDetailsPage({ params }) {
           </div>
 
           {/* Reviews Section */}
-          <div ref={reviewsRef} className="mt-16">
-            <div className="bg-white p-8 rounded-2xl shadow-lg border border-base-300">
+          <div className="mt-16">
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-3xl font-bold text-primary mb-2">Customer Reviews</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Customer Reviews</h2>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                      <span className="text-2xl font-bold text-base-content">{averageRating}</span>
+                      <span className="text-2xl font-bold text-gray-900">{averageRating}</span>
                     </div>
-                    <span className="text-base-content/70">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+                    <span className="text-gray-600">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
                   </div>
                 </div>
               </div>
